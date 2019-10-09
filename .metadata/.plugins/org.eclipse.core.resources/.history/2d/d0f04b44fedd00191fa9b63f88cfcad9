@@ -1,0 +1,118 @@
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.Box;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
+import javax.swing.JToolBar;
+
+public class Test extends JFrame{
+	
+	//菜单列表
+	JMenuBar menuBar =new JMenuBar();
+	//菜单项列表
+	List<JMenuItem> itemList=new ArrayList<>();
+	//创建工具栏
+	JToolBar toolBar=new JToolBar();
+	//右键弹出菜单
+	JPopupMenu popup = new JPopupMenu();
+	public Test(String title) {
+		super(title);
+		//总体布局分为两个部分，两个盒子。垂直分布
+		Box root = Box.createVerticalBox();
+		setContentPane(root);
+		
+		//添加菜单项（文件）
+		if(!itemList.isEmpty())	//列表只用一次，所以每次清空
+			itemList.clear();
+		JMenuItem newFile = createMenuItem(null, "newFile", "新建");
+		JMenuItem openFile = createMenuItem(null, "openFile", "打开文件...");
+		JMenuItem saveFile = createMenuItem(null, "saveFile", "保存");
+		JMenuItem saveAsFile = createMenuItem(null, "saveAsFile", "另存为...");
+		itemList.add(newFile);
+		itemList.add(openFile);
+		itemList.add(saveFile);
+		itemList.add(saveAsFile);
+		JMenu file = createMenu("文件", itemList);
+		menuBar.add(file);
+		menuBar.setPreferredSize(new Dimension(9999, 18));
+		
+		
+		/**
+		 * 添加工具栏
+		 * */
+			
+		root.addMouseListener(new MouseAdapter() {
+ 
+			@Override
+			public void mouseClicked(MouseEvent e)
+			{
+				if(e.getButton() == MouseEvent.BUTTON3)
+					popup.show(e.getComponent(), e.getX(), e.getY());
+			}
+			
+		});
+	}
+	//创建菜单
+	protected JMenu createMenu(String text, List<JMenuItem> item)	//一次性添加多个Item，所以用List集合
+	{
+		JMenu menu = new JMenu(text);
+		if(item != null)
+		{
+			for(JMenuItem i: item)
+			{
+				menu.add(i);
+			}
+		}
+			
+		return menu;
+	}
+	//创建菜单选项
+	protected JMenuItem createMenuItem(String filePath, String action, String text)
+	{
+		JMenuItem item = new JMenuItem(text);
+		//ActionCommand为命令码，用于区别各个选项，后用于监听事件
+		item.setActionCommand(action);	
+		//设置监听事件
+		item.addActionListener(listener);
+		if(filePath != null)
+		{
+			String fileName = "/images/" + filePath;
+			//获取资源文件
+			URL url = getClass().getResource(fileName);
+			//设置图标
+			item.setIcon(new ImageIcon(url));
+		}
+		return item;
+	}
+	//创建工具栏
+
+	
+	//监听事件
+	ActionListener listener = new ActionListener() {
+ 
+		@Override
+		public void actionPerformed(ActionEvent e)
+		{
+			//获取该控件命令码
+			String action = e.getActionCommand();
+			//通过对话框打印
+			JOptionPane.showMessageDialog(Test.this, action);
+		}
+		
+	};
+
+
+}
